@@ -268,3 +268,4 @@ model Review {
 
   @@unique([userId, productId])
   @@index([productId, rating])
+}
