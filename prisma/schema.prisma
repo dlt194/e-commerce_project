@@ -94,6 +94,7 @@ model ServicePackage {
   includesDatabase  Boolean              @default(false)
   includesHosting   Boolean              @default(false)
   includesAdminPanel Boolean             @default(false)
+  requiresKickoffCall Boolean            @default(true)
   status            ServicePackageStatus @default(DRAFT)
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
@@ -218,6 +219,7 @@ model Order {
   billingAddressId    String?
   shippingAddressId   String?
   placedAt            DateTime?
+  requiresKickoffCall Boolean            @default(true)
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   user                User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -229,6 +231,17 @@ model Order {
 
   @@index([userId, createdAt])
   @@index([status, fulfillmentStatus])
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }
 
 model OrderItem {
