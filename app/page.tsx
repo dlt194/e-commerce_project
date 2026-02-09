@@ -91,20 +91,18 @@ export default async function Page() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_50%)]" />
       </div>
       <NavBar />
-      {!acceptingOrders ? (
-        <section className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
-          <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
-            Orders are currently closed. You can still review packages and check
-            back when ordering reopens.
-          </div>
-        </section>
-      ) : null}
 
       <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-20 pt-20 sm:px-6 lg:pt-28">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/70">
           Web Development Studio
-          <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
-            2026 bookings open
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              acceptingOrders
+                ? "bg-emerald-400/20 text-emerald-200"
+                : "bg-rose-400/20 text-rose-200"
+            }`}
+          >
+            {acceptingOrders ? "2026 bookings open" : "orders currently closed"}
           </span>
         </div>
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
