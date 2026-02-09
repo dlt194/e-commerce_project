@@ -36,22 +36,27 @@ function packageDetails(pkg: {
 }
 
 export default async function Page() {
-  const dbPackages: ServiceTier[] = await prisma.servicePackage.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { createdAt: "asc" },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      summary: true,
-      priceCents: true,
-      isCustomQuote: true,
-      maxPages: true,
-      includesBackend: true,
-      includesDatabase: true,
-      includesAdminPanel: true,
-    },
-  });
+  let dbPackages: ServiceTier[] = [];
+  try {
+    dbPackages = await prisma.servicePackage.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        summary: true,
+        priceCents: true,
+        isCustomQuote: true,
+        maxPages: true,
+        includesBackend: true,
+        includesDatabase: true,
+        includesAdminPanel: true,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to load service packages from database", error);
+  }
 
   const fallbackPackages: ServiceTier[] = DEFAULT_SERVICE_PACKAGES.map(
     (pkg) => ({
