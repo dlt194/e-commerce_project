@@ -316,10 +316,10 @@ export default async function Page() {
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <a
-              href="mailto:hello@craftededge.studio"
+              href="mailto:hello@thomaswebstudio.uk"
               className="rounded-full bg-emerald-400 px-6 py-3 text-sm font-semibold text-black transition hover:bg-emerald-300"
             >
-              Email hello@thomaswebstudio.com
+              Email hello@thomaswebstudio.uk
             </a>
             <a
               href="#services"
