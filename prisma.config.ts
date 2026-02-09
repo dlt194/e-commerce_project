@@ -8,8 +8,8 @@ export default defineConfig({
   },
   datasource: {
     url:
-      process.env.DATABASE_URL ??
       process.env.TURSO_DATABASE_URL ??
+      process.env.DATABASE_URL ??
       "file:./dev.db",
   },
 });
