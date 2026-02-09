@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NavBar } from "@/components/nav-bar";
 import { requireUser, destroySession } from "@/lib/auth";
 
 async function signOutAction() {
@@ -11,7 +12,8 @@ export default async function AccountPage() {
 
   return (
     <main className="min-h-screen bg-[#0b0d0b] text-white">
-      <section className="mx-auto flex min-h-screen w-full max-w-5xl items-center px-4 py-20 sm:px-6">
+      <NavBar />
+      <section className="mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-5xl items-center px-4 py-20 sm:px-6">
         <div className="w-full rounded-3xl border border-white/10 bg-white/5 p-8">
           <div className="space-y-3">
             <p className="text-xs uppercase tracking-[0.2em] text-white/50">
@@ -26,12 +28,6 @@ export default async function AccountPage() {
             </p>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              href="/"
-              className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 transition hover:border-white/60 hover:bg-white/10"
-            >
-              Back to site
-            </Link>
             <Link
               href="/account/profile"
               className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 transition hover:border-white/60 hover:bg-white/10"

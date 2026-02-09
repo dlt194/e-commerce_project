@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { Prisma } from "@prisma/client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { NavBar } from "@/components/nav-bar";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { BackButton } from "./back-button";
@@ -120,6 +121,7 @@ export default async function ProfilePage({ searchParams }: ProfilePageProps) {
 
   return (
     <main className="min-h-screen bg-[#0b0d0b] text-white">
+      <NavBar />
       <section className="mx-auto w-full max-w-5xl px-4 py-20 sm:px-6">
         <div className="space-y-8 rounded-3xl border border-white/10 bg-white/5 p-8">
           <div className="flex flex-wrap items-center gap-3">
