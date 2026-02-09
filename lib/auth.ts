@@ -15,7 +15,8 @@ function addDays(date: Date, days: number) {
 }
 
 export const getCurrentUser = cache(async () => {
-  const token = cookies().get(SESSION_COOKIE)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
 
   const session = await prisma.session.findUnique({
@@ -54,7 +55,8 @@ export async function createSession(userId: string) {
     },
   });
 
-  cookies().set(SESSION_COOKIE, token, {
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -64,11 +66,12 @@ export async function createSession(userId: string) {
 }
 
 export async function destroySession() {
-  const token = cookies().get(SESSION_COOKIE)?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (token) {
     await prisma.session.deleteMany({ where: { token } });
   }
-  cookies().set(SESSION_COOKIE, "", {
+  cookieStore.set(SESSION_COOKIE, "", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
