@@ -7,9 +7,11 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
+    // Prisma CLI expects sqlite file URLs for this schema.
+    // Runtime Turso connectivity is handled by @prisma/adapter-libsql in lib/prisma.ts.
     url:
-      process.env.TURSO_DATABASE_URL ??
-      process.env.DATABASE_URL ??
-      "file:./dev.db",
+      process.env.DATABASE_URL?.startsWith("file:")
+        ? process.env.DATABASE_URL
+        : "file:./dev.db",
   },
 });
