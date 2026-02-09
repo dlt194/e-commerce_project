@@ -2,6 +2,7 @@ import { NavBar } from "@/components/nav-bar";
 import { addServiceToCartAction } from "@/app/actions/service-cart";
 import { DEFAULT_SERVICE_PACKAGES } from "@/lib/default-service-packages";
 import { prisma } from "@/lib/prisma";
+import { getSiteSetting } from "@/lib/site-settings";
 
 type ServiceTier = {
   id: string;
@@ -36,6 +37,9 @@ function packageDetails(pkg: {
 }
 
 export default async function Page() {
+  const siteSetting = await getSiteSetting();
+  const acceptingOrders = siteSetting?.acceptingOrders ?? true;
+
   let dbPackages: ServiceTier[] = [];
   try {
     dbPackages = await prisma.servicePackage.findMany({
@@ -87,6 +91,14 @@ export default async function Page() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_50%)]" />
       </div>
       <NavBar />
+      {!acceptingOrders ? (
+        <section className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
+          <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+            Orders are currently closed. You can still review packages and check
+            back when ordering reopens.
+          </div>
+        </section>
+      ) : null}
 
       <section className="relative mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-20 pt-20 sm:px-6 lg:pt-28">
         <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.2em] text-white/70">
@@ -203,9 +215,10 @@ export default async function Page() {
                 <input type="hidden" name="slug" value={tier.slug} />
                 <button
                   type="submit"
-                  className="w-full rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
+                  disabled={!acceptingOrders}
+                  className="w-full rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-white/20 disabled:hover:bg-transparent"
                 >
-                  Add to cart
+                  {acceptingOrders ? "Add to cart" : "Orders closed"}
                 </button>
               </form>
             </div>

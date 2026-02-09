@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createStripeCheckoutSessionAction } from "@/app/actions/stripe-checkout";
 import {
   removeServiceCartItemAction,
   updateServiceCartItemQuantityAction,
@@ -12,6 +13,28 @@ type CartPageProps = {
     error?: string;
   }>;
 };
+
+function cartErrorMessage(error?: string) {
+  if (error === "cart_unavailable") {
+    return "Cart is temporarily unavailable. Apply the latest migrations for this deployment.";
+  }
+  if (error === "empty_cart") {
+    return "Your cart is empty. Add a service before checkout.";
+  }
+  if (error === "custom_quote_checkout") {
+    return "Custom quote services cannot be checked out directly. Contact us to finalize pricing.";
+  }
+  if (error === "checkout_cancelled") {
+    return "Checkout was canceled. Your cart has been preserved.";
+  }
+  if (error === "checkout_unavailable") {
+    return "Checkout session could not be created. Please try again.";
+  }
+  if (error === "orders_closed") {
+    return "Orders are currently closed. Please check back soon.";
+  }
+  return null;
+}
 
 function formatMoney(cents: number | null, currency: string) {
   if (cents === null) return "Custom";
@@ -44,6 +67,7 @@ function isMissingCartTableError(error: unknown) {
 export default async function CartPage({ searchParams }: CartPageProps) {
   const user = await requireUser();
   const { error } = await searchParams;
+  const errorMessage = cartErrorMessage(error);
   let cartAvailable = hasServiceCartDelegates();
   let cart = null;
 
@@ -95,10 +119,10 @@ export default async function CartPage({ searchParams }: CartPageProps) {
             </Link>
           </div>
 
-          {!cartAvailable || error === "cart_unavailable" ? (
+          {!cartAvailable || errorMessage ? (
             <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-5 text-sm text-amber-100">
-              Cart is temporarily unavailable. Regenerate Prisma client and
-              apply migrations for this deployment.
+              {errorMessage ??
+                "Cart is temporarily unavailable. Regenerate Prisma client and apply migrations for this deployment."}
             </div>
           ) : null}
 
@@ -197,6 +221,14 @@ export default async function CartPage({ searchParams }: CartPageProps) {
                 <p className="mt-2 text-sm text-white/50">
                   Custom-quote services are excluded from subtotal until priced.
                 </p>
+                <form action={createStripeCheckoutSessionAction} className="mt-4">
+                  <button
+                    type="submit"
+                    className="w-full rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-300"
+                  >
+                    Proceed to payment
+                  </button>
+                </form>
               </div>
             </div>
           )}

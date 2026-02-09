@@ -64,6 +64,19 @@ enum ServicePackageStatus {
   ARCHIVED
 }
 
+enum ServiceOrderStatus {
+  PENDING
+  PAID
+  DELIVERED
+  CANCELLED
+}
+
+enum ServicePaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
 model User {
   id            String      @id @default(cuid())
   email         String      @unique
@@ -80,6 +93,7 @@ model User {
   reviews       Review[]
   sessions      Session[]
   serviceCart   ServiceCart?
+  serviceOrders ServiceOrder[]
 }
 
 model ServicePackage {
@@ -100,6 +114,7 @@ model ServicePackage {
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
   serviceCartItems  ServiceCartItem[]
+  serviceOrderItems ServiceOrderItem[]
 
   @@index([status])
 }
@@ -125,6 +140,71 @@ model ServiceCartItem {
 
   @@unique([serviceCartId, servicePackageId])
   @@index([servicePackageId])
+}
+
+model ServiceOrder {
+  id                     String             @id @default(cuid())
+  userId                 String
+  status                 ServiceOrderStatus @default(PENDING)
+  currency               String             @default("GBP")
+  subtotalCents          Int
+  totalCents             Int
+  requiresKickoffCall    Boolean            @default(true)
+  kickoffCallConfirmed   Boolean            @default(false)
+  kickoffCallConfirmedAt DateTime?
+  deliveredAt            DateTime?
+  supportExpiresAt       DateTime?
+  isArchived             Boolean            @default(false)
+  archivedAt             DateTime?
+  stripeCheckoutSessionId String?           @unique
+  stripePaymentIntentId  String?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items                  ServiceOrderItem[]
+  payment                ServicePayment?
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model ServiceOrderItem {
+  id                String          @id @default(cuid())
+  serviceOrderId    String
+  servicePackageId  String?
+  serviceName       String
+  quantity          Int
+  unitPriceCents    Int
+  totalPriceCents   Int
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  serviceOrder      ServiceOrder    @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+  servicePackage    ServicePackage? @relation(fields: [servicePackageId], references: [id], onDelete: SetNull)
+
+  @@index([serviceOrderId])
+  @@index([servicePackageId])
+}
+
+model ServicePayment {
+  id             String               @id @default(cuid())
+  serviceOrderId String               @unique
+  providerRef    String?
+  status         ServicePaymentStatus @default(PENDING)
+  amountCents    Int
+  currency       String               @default("GBP")
+  paidAt         DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  serviceOrder   ServiceOrder         @relation(fields: [serviceOrderId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model SiteSetting {
+  id              String   @id @default(cuid())
+  acceptingOrders Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Category {

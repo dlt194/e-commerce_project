@@ -8,6 +8,7 @@ import {
   findDefaultServicePackage,
 } from "@/lib/default-service-packages";
 import { prisma } from "@/lib/prisma";
+import { getSiteSetting } from "@/lib/site-settings";
 
 function hasServiceCartDelegates() {
   const db = prisma as unknown as {
@@ -49,6 +50,11 @@ async function ensureServicePackage(slug: string) {
 
 export async function addServiceToCartAction(formData: FormData) {
   const user = await requireUser();
+  const siteSetting = await getSiteSetting();
+  if (siteSetting && !siteSetting.acceptingOrders) {
+    redirect("/cart?error=orders_closed");
+  }
+
   if (!hasServiceCartDelegates()) {
     redirect("/cart?error=cart_unavailable");
   }
