@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 type LoginState = {
   error?: string;
@@ -11,7 +11,7 @@ export function LoginForm({
 }: {
   action: (prevState: LoginState, formData: FormData) => Promise<LoginState>;
 }) {
-  const [state, formAction] = useFormState(action, {});
+  const [state, formAction] = useActionState(action, {});
 
   return (
     <form action={formAction} className="grid gap-4">
