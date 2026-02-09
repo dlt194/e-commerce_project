@@ -1,6 +1,78 @@
 import { NavBar } from "@/components/nav-bar";
+import { addServiceToCartAction } from "@/app/actions/service-cart";
+import { DEFAULT_SERVICE_PACKAGES } from "@/lib/default-service-packages";
+import { prisma } from "@/lib/prisma";
 
-export default function Page() {
+type ServiceTier = {
+  id: string;
+  slug: string;
+  name: string;
+  summary: string | null;
+  priceCents: number | null;
+  isCustomQuote: boolean;
+  maxPages: number | null;
+  includesBackend: boolean;
+  includesDatabase: boolean;
+  includesAdminPanel: boolean;
+};
+
+function formatPrice(priceCents: number | null, isCustomQuote: boolean) {
+  if (isCustomQuote || priceCents === null) return "Custom";
+  return `£${(priceCents / 100).toFixed(0)}`;
+}
+
+function packageDetails(pkg: {
+  maxPages: number | null;
+  includesBackend: boolean;
+  includesDatabase: boolean;
+  includesAdminPanel: boolean;
+}) {
+  return [
+    pkg.maxPages ? `Up to ${pkg.maxPages} page${pkg.maxPages > 1 ? "s" : ""}` : "Flexible pages",
+    pkg.includesDatabase ? "Database included" : "No database",
+    pkg.includesBackend ? "Backend included" : "No backend",
+    pkg.includesAdminPanel ? "Admin panel included" : "Admin panel not included",
+  ];
+}
+
+export default async function Page() {
+  const dbPackages: ServiceTier[] = await prisma.servicePackage.findMany({
+    where: { status: "ACTIVE" },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      summary: true,
+      priceCents: true,
+      isCustomQuote: true,
+      maxPages: true,
+      includesBackend: true,
+      includesDatabase: true,
+      includesAdminPanel: true,
+    },
+  });
+
+  const fallbackPackages: ServiceTier[] = DEFAULT_SERVICE_PACKAGES.map(
+    (pkg) => ({
+      id: `default-${pkg.slug}`,
+      slug: pkg.slug,
+      name: pkg.name,
+      summary: pkg.summary,
+      priceCents: pkg.priceCents,
+      isCustomQuote: pkg.isCustomQuote,
+      maxPages: pkg.maxPages,
+      includesBackend: pkg.includesBackend,
+      includesDatabase: pkg.includesDatabase,
+      includesAdminPanel: pkg.includesAdminPanel,
+    })
+  );
+
+  const packages: ServiceTier[] =
+    dbPackages.length > 0
+      ? dbPackages
+      : fallbackPackages;
+
   return (
     <main className="min-h-screen bg-[#0b0d0b] text-white">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -97,80 +169,40 @@ export default function Page() {
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {[
-            {
-              title: "Single Page Sprint",
-              price: "£500",
-              description:
-                "A focused, high-converting landing page with sharp copy and design.",
-              details: [
-                "1 page",
-                "No database or backend",
-                "Hosting optional from £80 p/m",
-                "Perfect for MVPs",
-              ],
-            },
-            {
-              title: "Five Page Studio",
-              price: "£1200",
-              description:
-                "A full marketing site with multiple sections, built for credibility.",
-              details: [
-                "Up to 5 pages",
-                "No database or backend",
-                "Hosting optional from £100 p/m",
-                "Launch-ready in 2 weeks",
-              ],
-            },
-            {
-              title: "Full Stack Growth",
-              price: "£2500",
-              description:
-                "A complete web platform with database, admin panel, and scale-ready architecture.",
-              details: [
-                "Up to 10 pages",
-                "Database + backend",
-                "Admin panel included",
-                "Hosting optional from £140 p/m",
-              ],
-            },
-            {
-              title: "Bespoke Build",
-              price: "Custom",
-              description:
-                "Tailored scope, advanced integrations, and product strategy.",
-              details: [
-                "Flexible pages",
-                "Custom infrastructure",
-                "Premium UX + branding",
-                "Priority delivery",
-              ],
-            },
-          ].map((tier) => (
+          {packages.map((tier) => (
             <div
-              key={tier.title}
+              key={tier.id}
               className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 transition hover:border-emerald-300/40 hover:bg-white/10"
             >
               <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-emerald-400/10 blur-2xl transition group-hover:bg-emerald-300/30" />
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-2xl font-semibold">{tier.title}</h3>
+                  <h3 className="text-2xl font-semibold">{tier.name}</h3>
                   <p className="mt-2 text-sm text-white/70">
-                    {tier.description}
+                    {tier.summary ?? "Built to match your project goals."}
                   </p>
                 </div>
                 <span className="rounded-full border border-white/10 bg-black/40 px-4 py-2 text-sm font-semibold">
-                  {tier.price}
+                  {formatPrice(tier.priceCents, tier.isCustomQuote)}
                 </span>
               </div>
               <ul className="mt-6 space-y-2 text-sm text-white/70">
-                {tier.details.map((item) => (
+                {packageDetails(tier).map((item) => (
                   <li key={item} className="flex items-center gap-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                     {item}
                   </li>
                 ))}
               </ul>
+              <form action={addServiceToCartAction} className="mt-6">
+                <input type="hidden" name="slug" value={tier.slug} />
+                <button
+                  type="submit"
+                  className="w-full rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
+                >
+                  Add to cart
+                </button>
+              </form>
             </div>
           ))}
         </div>

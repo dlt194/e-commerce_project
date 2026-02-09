@@ -22,6 +22,12 @@ export const NavBar = () => {
         </div>
         <div className="flex items-center gap-3">
           <Link
+            href="/cart"
+            className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
+          >
+            Cart
+          </Link>
+          <Link
             href="/login"
             className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
           >
