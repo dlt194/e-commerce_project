@@ -3,8 +3,15 @@ import {
   removeServiceCartItemAction,
   updateServiceCartItemQuantityAction,
 } from "@/app/actions/service-cart";
+import { NavBar } from "@/components/nav-bar";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+type CartPageProps = {
+  searchParams: Promise<{
+    error?: string;
+  }>;
+};
 
 function formatMoney(cents: number | null, currency: string) {
   if (cents === null) return "Custom";
@@ -15,20 +22,52 @@ function formatMoney(cents: number | null, currency: string) {
   }).format(cents / 100);
 }
 
-export default async function CartPage() {
-  const user = await requireUser();
+function hasServiceCartDelegates() {
+  const db = prisma as unknown as {
+    serviceCart?: { findUnique?: unknown };
+    serviceCartItem?: { findUnique?: unknown };
+  };
+  return (
+    typeof db.serviceCart?.findUnique === "function" &&
+    typeof db.serviceCartItem?.findUnique === "function"
+  );
+}
 
-  const cart = await prisma.serviceCart.findUnique({
-    where: { userId: user.id },
-    include: {
-      items: {
+function isMissingCartTableError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("no such table: main.ServiceCart") ||
+    message.includes("no such table: main.ServiceCartItem")
+  );
+}
+
+export default async function CartPage({ searchParams }: CartPageProps) {
+  const user = await requireUser();
+  const { error } = await searchParams;
+  let cartAvailable = hasServiceCartDelegates();
+  let cart = null;
+
+  if (cartAvailable) {
+    try {
+      cart = await prisma.serviceCart.findUnique({
+        where: { userId: user.id },
         include: {
-          servicePackage: true,
+          items: {
+            include: {
+              servicePackage: true,
+            },
+            orderBy: { createdAt: "asc" },
+          },
         },
-        orderBy: { createdAt: "asc" },
-      },
-    },
-  });
+      });
+    } catch (queryError) {
+      if (isMissingCartTableError(queryError)) {
+        cartAvailable = false;
+      } else {
+        throw queryError;
+      }
+    }
+  }
 
   const items = cart?.items ?? [];
   const totalCents = items.reduce((sum, item) => {
@@ -38,6 +77,7 @@ export default async function CartPage() {
 
   return (
     <main className="min-h-screen bg-[#0b0d0b] text-white">
+      <NavBar />
       <section className="mx-auto w-full max-w-5xl px-4 py-20 sm:px-6">
         <div className="space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -54,6 +94,13 @@ export default async function CartPage() {
               Add more services
             </Link>
           </div>
+
+          {!cartAvailable || error === "cart_unavailable" ? (
+            <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-5 text-sm text-amber-100">
+              Cart is temporarily unavailable. Regenerate Prisma client and
+              apply migrations for this deployment.
+            </div>
+          ) : null}
 
           {items.length === 0 ? (
             <div className="rounded-2xl border border-white/10 bg-black/40 p-8 text-center">
