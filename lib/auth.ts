@@ -2,8 +2,8 @@ import { randomUUID } from "crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { User } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { User } from "@/lib/generated/prisma";
 
 const SESSION_COOKIE = "tw_session";
 const SESSION_DAYS = 30;

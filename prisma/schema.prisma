@@ -79,6 +79,7 @@ model User {
   carts         Cart[]
   orders        Order[]
   reviews       Review[]
+  sessions      Session[]
 }
 
 model ServicePackage {
