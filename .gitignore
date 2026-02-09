@@ -27,8 +27,12 @@ pnpm-debug.log*
 # sqlite database artifacts
 *.db
 *.db-journal
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
 
 # testing
 coverage/

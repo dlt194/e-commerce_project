@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser, destroySession } from "@/lib/auth";
 
 async function signOutAction() {
@@ -25,12 +26,18 @@ export default async function AccountPage() {
             </p>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <a
+            <Link
               href="/"
               className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 transition hover:border-white/60 hover:bg-white/10"
             >
               Back to site
-            </a>
+            </Link>
+            <Link
+              href="/account/profile"
+              className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 transition hover:border-white/60 hover:bg-white/10"
+            >
+              Profile
+            </Link>
             <form action={signOutAction}>
               <button
                 type="submit"

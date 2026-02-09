@@ -10,13 +10,13 @@ export const NavBar = () => {
           </span>
         </Link>
         <div className="hidden items-center gap-6 text-sm text-white/80 md:flex">
-          <Link href="#services" className="transition hover:text-white">
+          <Link href="/#services" className="transition hover:text-white">
             Services
           </Link>
-          <Link href="#process" className="transition hover:text-white">
+          <Link href="/#process" className="transition hover:text-white">
             Process
           </Link>
-          <Link href="#hosting" className="transition hover:text-white">
+          <Link href="/#hosting" className="transition hover:text-white">
             Hosting
           </Link>
         </div>
@@ -28,13 +28,13 @@ export const NavBar = () => {
             Login
           </Link>
           <Link
-            href="#contact"
+            href="/#contact"
             className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
           >
             Book a Call
           </Link>
           <Link
-            href="#services"
+            href="/#services"
             className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90"
           >
             View Packages

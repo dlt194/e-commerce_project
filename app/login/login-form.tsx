@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 
 type LoginState = {
@@ -52,6 +53,12 @@ export function LoginForm({
       >
         Sign in
       </button>
+      <p className="text-center text-sm text-white/70">
+        Need an account?{" "}
+        <Link href="/register" className="font-semibold text-emerald-200">
+          Register
+        </Link>
+      </p>
     </form>
   );
 }

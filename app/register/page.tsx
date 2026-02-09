@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { NavBar } from "@/components/nav-bar";
-import { loginAction } from "./actions";
-import { LoginForm } from "./login-form";
+import { registerAction } from "./actions";
+import { RegisterForm } from "./register-form";
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   const user = await getCurrentUser();
   if (user) {
     redirect(user.role === "ADMIN" ? "/admin" : "/account");
@@ -19,17 +19,17 @@ export default async function LoginPage() {
       </div>
       <NavBar />
       <section className="relative mx-auto flex min-h-[calc(100vh-73px)] w-full max-w-6xl items-center justify-center px-4 py-20 sm:px-6">
-        <div className="w-full max-w-md space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+        <div className="w-full max-w-lg space-y-6 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
           <div className="space-y-2 text-center">
             <p className="text-xs uppercase tracking-[0.2em] text-white/50">
               Thomas Web Studio
             </p>
-            <h1 className="text-3xl font-semibold">Welcome back</h1>
+            <h1 className="text-3xl font-semibold">Create your account</h1>
             <p className="text-sm text-white/70">
-              Sign in to access your project workspace.
+              Register to access your project workspace.
             </p>
           </div>
-          <LoginForm action={loginAction} />
+          <RegisterForm action={registerAction} />
         </div>
       </section>
     </main>
