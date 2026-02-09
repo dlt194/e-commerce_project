@@ -143,12 +143,4 @@ Set Stripe webhook endpoint to:
 https://<your-domain>/api/stripe/webhook
 ```
 
-Listen for:
 
-- `checkout.session.completed`
-
-## Notes
-
-- Do not commit runtime DB files (`*.db`, `*.sqlite`, journal/wal/shm files).
-- Commit Prisma schema and migration files.
-- If order/cart features appear unavailable in production, first verify that latest migrations were applied to Turso.
