@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "Thomas Web Studio",
   description:
     "High-converting websites and full-stack builds for modern service businesses.",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
